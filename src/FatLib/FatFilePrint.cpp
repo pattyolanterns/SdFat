@@ -235,6 +235,80 @@ fail:
   return false;
 }
 //------------------------------------------------------------------------------
+bool FatFile::getModifyDateTime(char* date) {
+	dir_t dir;
+	if (!dirEntry(&dir)) {
+		DBG_FAIL_MACRO;
+		return false;
+	}
+	date[0] = '\0';
+
+	// Year
+	char buf[11];
+	char* ptr = buf + sizeof(buf);
+	*--ptr = 0;
+	strcat(date, fmtDec(FAT_YEAR(dir.lastWriteDate), ptr));
+
+	// Month
+	char c0 = '?';
+	char c1 = '?';
+	if (FAT_MONTH(dir.lastWriteDate) < 100) {
+		c1 = FAT_MONTH(dir.lastWriteDate) / 10;
+		c0 = FAT_MONTH(dir.lastWriteDate) - 10 * c1 + '0';
+		c1 += '0';
+	}
+	date[4] = c1;
+	date[5] = c0;
+
+	// Day
+	c0 = '?';
+	c1 = '?';
+	if (FAT_DAY(dir.lastWriteDate) < 100) {
+		c1 = FAT_DAY(dir.lastWriteDate) / 10;
+		c0 = FAT_DAY(dir.lastWriteDate) - 10 * c1 + '0';
+		c1 += '0';
+	}
+	date[6] = c1;
+	date[7] = c0;
+
+	// Hour
+	c0 = '?';
+	c1 = '?';
+	if (FAT_HOUR(dir.lastWriteTime) < 100) {
+		c1 = FAT_HOUR(dir.lastWriteTime) / 10;
+		c0 = FAT_HOUR(dir.lastWriteTime) - 10 * c1 + '0';
+		c1 += '0';
+	}
+	date[8] = c1;
+	date[9] = c0;
+
+	// Minute
+	c0 = '?';
+	c1 = '?';
+	if (FAT_MINUTE(dir.lastWriteTime) < 100) {
+		c1 = FAT_MINUTE(dir.lastWriteTime) / 10;
+		c0 = FAT_MINUTE(dir.lastWriteTime) - 10 * c1 + '0';
+		c1 += '0';
+	}
+	date[10] = c1;
+	date[11] = c0;
+
+	// Second
+	c0 = '?';
+	c1 = '?';
+	if (FAT_SECOND(dir.lastWriteTime) < 100) {
+		c1 = FAT_SECOND(dir.lastWriteTime) / 10;
+		c0 = FAT_SECOND(dir.lastWriteTime) - 10 * c1 + '0';
+		c1 += '0';
+	}
+	date[12] = c1;
+	date[13] = c0;
+
+	date[14] = '\0';
+
+	return true;
+}
+//------------------------------------------------------------------------------
 size_t FatFile::printFileSize(print_t* pr) {
   char buf[11];
   char *ptr = buf + sizeof(buf);
